@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Swarovski Discount Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #fff0f5;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ffc0cb;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: #ffffff;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+            border: 1px solid #ffc0cb;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #ff69b4;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-right: 10px;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #ff1493;
+        }
+        .result {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Swarovski Discount Calculator</h1>
+        <div id="items-container"></div>
+        <button onclick="addItem()">Add Item</button>
+        <button onclick="calculateTotal()">Calculate Total</button>
+        <button onclick="resetForm()">Reset</button>
+        <div class="result" id="result"></div>
+        <div class="summary" id="itemResults"></div>
+
+        <h2>Maximum Spend Calculator</h2>
+        <div class="input-group">
+            <label for="firstItemPrice">First Item Price:</label>
+            <input type="number" id="firstItemPrice" placeholder="Enter price of the first item">
+        </div>
+        <div class="input-group">
+            <label for="customerBudget">Customer Budget:</label>
+            <input type="number" id="customerBudget" placeholder="Enter customer's budget">
+        </div>
+        <p>This is the value of the second item the customer needs to buy to stay within budget.</p>
+        <button onclick="calculateMaximumSpend()">Calculate Maximum Spend</button>
+        <div class="result" id="maxSpendResult"></div>
+    </div>
+
+    <script>
+        let itemCount = 0;
+
+        function addItem() {
+            itemCount++;
+            const container = document.getElementById('items-container');
+            const inputGroup = document.createElement('div');
+            inputGroup.className = 'input-group';
+            inputGroup.innerHTML = `
+                <label for="item${itemCount}Price">Item ${itemCount} Price:</label>
+                <input type="number" id="item${itemCount}Price" placeholder="Enter price of item ${itemCount}">
+            `;
+            container.appendChild(inputGroup);
+        }
+
+        function calculateTotal() {
+            let total = 0;
+            let itemEnteredCount = 0;
+            let itemResults = '<h3>Item Details:</h3>';
+
+            for (let i = 1; i <= itemCount; i++) {
+                const itemPrice = parseFloat(document.getElementById(`item${i}Price`).value) || 0;
+                if (itemPrice > 0) {
+                    itemEnteredCount++;
+                    total += itemPrice;
+                    const discountedPrice = itemPrice * 0.8;
+                    itemResults += `<div class="summary-item">Item ${i}: Original Price: $${itemPrice.toFixed(2)}, After Discount: $${discountedPrice.toFixed(2)}</div>`;
+                }
+            }
+
+            if (itemEnteredCount >= 2) {
+                total *= 0.8; // Apply 20% discount to the total
+            }
+
+            document.getElementById('result').innerText = 'Total after discount: $' + total.toFixed(2);
+            document.getElementById('itemResults').innerHTML = itemResults;
+        }
+
+        function calculateMaximumSpend() {
+            const firstItemPrice = parseFloat(document.getElementById('firstItemPrice').value) || 0;
+            const customerBudget = parseFloat(document.getElementById('customerBudget').value) || 0;
+
+            if (firstItemPrice <= 0 || customerBudget <= 0) {
+                alert('Please enter valid values for both fields.');
+                return;
+            }
+
+            const maxSpend = (customerBudget / 0.8) - firstItemPrice;
+
+            document.getElementById('maxSpendResult').innerText = 'Maximum spend on second item to keep total under $' + customerBudget.toFixed(2) + ': $' + maxSpend.toFixed(2);
+        }
+
+        function resetForm() {
+            document.getElementById('items-container').innerHTML = '';
+            document.getElementById('result').innerText = '';
+            document.getElementById('itemResults').innerHTML = '';
+            document.getElementById('maxSpendResult').innerText = '';
+            itemCount = 0;
+            addItem();
+            addItem();
+        }
+
+        // Add initial item input fields
+        addItem();
+        addItem();
+    </script>
+</body>
+</html>
