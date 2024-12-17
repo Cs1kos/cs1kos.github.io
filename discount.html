@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Marcus' Swarovski Discount Calculator</title>
+    <title>Swarovski Discount Calculator</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -51,6 +51,12 @@
             margin-top: 20px;
             font-weight: bold;
         }
+        .summary {
+            margin-top: 20px;
+        }
+        .summary-item {
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
@@ -97,20 +103,30 @@
             let itemEnteredCount = 0;
             let itemResults = '<h3>Item Details:</h3>';
 
+            // Track valid items count
+            let validItemCount = 0;
+
+            // Check all items and calculate total
             for (let i = 1; i <= itemCount; i++) {
                 const itemPrice = parseFloat(document.getElementById(`item${i}Price`).value) || 0;
                 if (itemPrice > 0) {
-                    itemEnteredCount++;
-                    total += itemPrice;
-                    const discountedPrice = itemPrice * 0.8;
+                    validItemCount++;  // Increment valid item count for each non-zero price
+                    const discountedPrice = itemPrice * 0.8;  // Default to 20% discount
+                    total += discountedPrice;
                     itemResults += `<div class="summary-item">Item ${i}: Original Price: $${itemPrice.toFixed(2)}, After Discount: $${discountedPrice.toFixed(2)}</div>`;
                 }
             }
 
-            if (itemEnteredCount >= 2) {
-                total *= 0.8; // Apply 20% discount to the total
+            // Apply 30% discount if 3 or more valid items
+            if (validItemCount >= 3) {
+                total *= 0.7;  // Apply 30% discount to total if 3 or more valid items
+                itemResults += `<div class="summary-item">Applying 30% discount for 3 or more items</div>`;
+            } else if (validItemCount >= 2) {
+                total *= 0.8;  // Apply 20% discount to total if exactly 2 valid items
+                itemResults += `<div class="summary-item">Applying 20% discount for 2 items</div>`;
             }
 
+            // Display the total after discount
             document.getElementById('result').innerText = 'Total after discount: $' + total.toFixed(2);
             document.getElementById('itemResults').innerHTML = itemResults;
         }
