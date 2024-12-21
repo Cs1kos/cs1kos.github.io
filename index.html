@@ -3,322 +3,161 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Marcus' Transaction Tracker Tool</title>
+    <title>Marcus' Swarovski Discount Calculator 2.0</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
         body {
-            font-family: 'Roboto', sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #e3f2fd;
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #fff0f5;
+            color: #333;
         }
         .container {
-            background-color: #fff;
+            max-width: 600px;
+            margin: auto;
             padding: 20px;
+            border: 1px solid #ffc0cb;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 90%;
-            max-width: 1200px;
-            text-align: center;
-            border: 2px solid #90caf9;
+            background-color: #ffffff;
         }
-        h1 {
-            color: #42a5f5;
-        }
-        .input-field {
+        .input-group {
             margin-bottom: 15px;
         }
         label {
             display: block;
             margin-bottom: 5px;
-            color: #333;
         }
-        select, input[type="number"] {
+        input[type="number"] {
             width: 100%;
-            padding: 8px;
-            margin: 0 0 10px 0;
-            border: 1px solid #ccc;
+            padding: 10px;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+            border: 1px solid #ffc0cb;
             border-radius: 5px;
-            background-color: #e3f2fd;
         }
         button {
-            display: block;
-            width: 100%;
-            padding: 10px;
-            background-color: #42a5f5;
+            padding: 10px 20px;
+            background-color: #ff69b4;
             color: white;
             border: none;
-            border-radius: 5px;
             cursor: pointer;
-            margin-bottom: 10px;
+            margin-right: 10px;
+            border-radius: 5px;
         }
         button:hover {
-            background-color: #1e88e5;
-        }
-        .workers {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        .worker-container {
-            margin: 10px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            width: 250px;
-            background-color: #f9f9f9;
-            position: relative;
-        }
-        .worker-container button.remove-btn {
-            background-color: #f44336;
-            width: auto;
-            padding: 5px 10px;
-            position: absolute;
-            top: 10px;
-            right: 10px;
-        }
-        .worker-container button.remove-btn:hover {
-            background-color: #d32f2f;
+            background-color: #ff1493;
         }
         .result {
-            margin-top: 15px;
-            color: #333;
+            margin-top: 20px;
+            font-weight: bold;
         }
-        .break-notation {
-            color: green;
+        .summary {
+            margin-top: 20px;
         }
-        .switch-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        .switch-input {
-            display: none;
-        }
-        .switch-label {
-            position: relative;
-            width: 60px;
-            height: 34px;
-            background-color: #ccc;
-            border-radius: 34px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            margin-left: 10px;
-        }
-        .switch-label::before {
-            content: "";
-            position: absolute;
-            width: 26px;
-            height: 26px;
-            border-radius: 50%;
-            background-color: white;
-            top: 4px;
-            left: 4px;
-            transition: transform 0.3s;
-        }
-        .switch-input:checked + .switch-label {
-            background-color: #007BFF;
-        }
-        .switch-input:checked + .switch-label::before {
-            transform: translateX(26px);
+        .summary-item {
+            margin-bottom: 10px;
         }
     </style>
 </head>
 <body>
+    <div class="container">
+        <h1>Marcus' Swarovski Discount Calculator</h1>
+        <div id="items-container"></div>
+        <button onclick="addItem()">Add Item</button>
+        <button onclick="calculateTotal()">Calculate Total</button>
+        <button onclick="resetForm()">Reset</button>
+        <div class="result" id="result"></div>
+        <div class="summary" id="itemResults"></div>
 
-<div class="container">
-    <h1>Marcus' Transaction Tracker Tool</h1>
-    <div class="input-field">
-        <label for="tph">Transactions per Hour</label>
-        <input type="number" id="tph" placeholder="Enter transactions per hour" step="0.1">
+        <h2>Maximum Spend Calculator</h2>
+        <div class="input-group">
+            <label for="firstItemPrice">First Item Price:</label>
+            <input type="number" id="firstItemPrice" placeholder="Enter price of the first item">
+        </div>
+        <div class="input-group">
+            <label for="customerBudget">Customer Budget:</label>
+            <input type="number" id="customerBudget" placeholder="Enter customer's budget">
+        </div>
+        <p>This is the value of the second item the customer needs to buy to stay within budget.</p>
+        <button onclick="calculateMaximumSpend()">Calculate Maximum Spend</button>
+        <div class="result" id="maxSpendResult"></div>
     </div>
-    <div class="switch-container">
-        <label for="switch">Toggle 24 hr time</label>
-        <input type="checkbox" id="switch" class="switch-input" onchange="toggleTimeFormat()">
-        <label for="switch" class="switch-label"></label>
-    </div>
-    <div id="workers" class="workers"></div>
-    <button onclick="addWorker()">Add Worker</button>
-    <button onclick="calculateAllTransactions()">Calculate Total Transactions</button>
-    <div class="result">
-        <p id="total-output"></p>
-    </div>
-</div>
 
-<script>
-    let workerCount = 0;
-    let is24HourFormat = false;
+    <script>
+        let itemCount = 0;
 
-    const amPmTimes = [
-        '8:45 AM', '9:00 AM', '9:15 AM', '9:30 AM', '9:45 AM',
-        '10:00 AM', '10:15 AM', '10:30 AM', '10:45 AM',
-        '11:00 AM', '11:15 AM', '11:30 AM', '11:45 AM',
-        '12:00 PM', '12:15 PM', '12:30 PM', '12:45 PM',
-        '1:00 PM', '1:15 PM', '1:30 PM', '1:45 PM',
-        '2:00 PM', '2:15 PM', '2:30 PM', '2:45 PM',
-        '3:00 PM', '3:15 PM', '3:30 PM', '3:45 PM',
-        '4:00 PM', '4:15 PM', '4:30 PM', '4:45 PM',
-        '5:00 PM', '5:15 PM', '5:30 PM', '5:45 PM',
-        '6:00 PM', '6:15 PM', '6:30 PM', '6:45 PM',
-        '7:00 PM', '7:15 PM', '7:30 PM', '7:45 PM',
-        '8:00 PM', '8:15 PM', '8:30 PM', '8:45 PM',
-        '9:00 PM', '9:15 PM'
-    ];
-
-    const hour24Times = [
-        '08:45', '09:00', '09:15', '09:30', '09:45',
-        '10:00', '10:15', '10:30', '10:45',
-        '11:00', '11:15', '11:30', '11:45',
-        '12:00', '12:15', '12:30', '12:45',
-        '13:00', '13:15', '13:30', '13:45',
-        '14:00', '14:15', '14:30', '14:45',
-        '15:00', '15:15', '15:30', '15:45',
-        '16:00', '16:15', '16:30', '16:45',
-        '17:00', '17:15', '17:30', '17:45',
-        '18:00', '18:15', '18:30', '18:45',
-        '19:00', '19:15', '19:30', '19:45',
-        '20:00', '20:15', '20:30', '20:45',
-        '21:00', '21:15'
-    ];
-
-    function populateTimeOptions(selectElement, times) {
-        selectElement.innerHTML = "";
-        times.forEach(time => {
-            let option = document.createElement("option");
-            option.value = time;
-            option.text = time;
-            selectElement.appendChild(option);
-        });
-    }
-
-    function addWorker() {
-        workerCount++;
-        const workerContainer = document.createElement('div');
-        workerContainer.classList.add('worker-container');
-        workerContainer.id = `worker-${workerCount}`;
-
-        workerContainer.innerHTML = `
-            <div class="input-field">
-                <label for="start-time-${workerCount}">Start Time</label>
-                <select id="start-time-${workerCount}"></select>
-            </div>
-            <div class="input-field">
-                <label for="end-time-${workerCount}">End Time</label>
-                <select id="end-time-${workerCount}"></select>
-            </div>
-            <button class="remove-btn" onclick="removeWorker(${workerCount})">Remove</button>
-            <div class="result">
-                <p id="output-${workerCount}"></p>
-            </div>
-        `;
-
-        document.getElementById('workers').appendChild(workerContainer);
-
-        const times = is24HourFormat ? hour24Times : amPmTimes;
-        populateTimeOptions(document.getElementById(`start-time-${workerCount}`), times);
-        populateTimeOptions(document.getElementById(`end-time-${workerCount}`), times);
-    }
-
-    function removeWorker(workerId) {
-        const workerContainer = document.getElementById(`worker-${workerId}`);
-        if (workerContainer) {
-            workerContainer.remove();
-        }
-    }
-
-    function toggleTimeFormat() {
-        is24HourFormat = document.getElementById('switch').checked;
-        for (let i = 1; i <= workerCount; i++) {
-            const startTimeSelect = document.getElementById(`start-time-${i}`);
-            const endTimeSelect = document.getElementById(`end-time-${i}`);
-            if (startTimeSelect && endTimeSelect) {
-                const selectedStartTime = startTimeSelect.value;
-                const selectedEndTime = endTimeSelect.value;
-                const newStartTime = is24HourFormat ? convert12To24(selectedStartTime) : convert24To12(selectedStartTime);
-                const newEndTime = is24HourFormat ? convert12To24(selectedEndTime) : convert24To12(selectedEndTime);
-                const times = is24HourFormat ? hour24Times : amPmTimes;
-                populateTimeOptions(startTimeSelect, times);
-                populateTimeOptions(endTimeSelect, times);
-                startTimeSelect.value = newStartTime;
-                endTimeSelect.value = newEndTime;
-            }
-        }
-    }
-
-    function calculateAllTransactions() {
-        let tph = parseFloat(document.getElementById("tph").value);
-        if (isNaN(tph)) {
-            alert("Please enter a valid number for transactions per hour.");
-            return;
+        function addItem() {
+            itemCount++;
+            const container = document.getElementById('items-container');
+            const inputGroup = document.createElement('div');
+            inputGroup.className = 'input-group';
+            inputGroup.innerHTML = `
+                <label for="item${itemCount}Price">Item ${itemCount} Price:</label>
+                <input type="number" id="item${itemCount}Price" placeholder="Enter price of item ${itemCount}">
+            `;
+            container.appendChild(inputGroup);
         }
 
-        let totalTransactions = 0;
-        let totalHoursWorked = 0;
+        function calculateTotal() {
+            let total = 0;
+            let itemEnteredCount = 0;
+            let itemResults = '<h3>Item Details:</h3>';
 
-        for (let i = 1; i <= workerCount; i++) {
-            const workerContainer = document.getElementById(`worker-${i}`);
-            if (workerContainer) {
-                let startTime = document.getElementById(`start-time-${i}`).value;
-                let endTime = document.getElementById(`end-time-${i}`).value;
+            // Track valid items count
+            let validItemCount = 0;
 
-                let start = new Date("01/01/2020 " + (is24HourFormat ? convert24To12(startTime) : startTime));
-                let end = new Date("01/01/2020 " + (is24HourFormat ? convert24To12(endTime) : endTime));
-
-                let totalMinutesWorked = (end - start) / (1000 * 60);
-                let hoursWorked = totalMinutesWorked / 60;
-
-                let breakTime = 0;
-                let breakNotation = "";
-
-                if (hoursWorked >= 10.5) {
-                    breakTime = 60;
-                    breakNotation = "(1 hour break)";
-                } else if (hoursWorked >= 5.5) {
-                    breakTime = 30;
-                    breakNotation = "(30 minutes break)";
+            // Check all items and calculate total
+            for (let i = 1; i <= itemCount; i++) {
+                const itemPrice = parseFloat(document.getElementById(`item${i}Price`).value) || 0;
+                if (itemPrice > 0) {
+                    validItemCount++;  // Increment valid item count for each non-zero price
+                    const discountedPrice = itemPrice * 0.8;  // Default to 20% discount
+                    total += discountedPrice;
+                    itemResults += `<div class="summary-item">Item ${i}: Original Price: $${itemPrice.toFixed(2)}, After Discount: $${discountedPrice.toFixed(2)}</div>`;
                 }
-
-                let actualWorkedHours = hoursWorked - (breakTime / 60);
-                let transactions = actualWorkedHours * tph;
-
-                document.getElementById(`output-${i}`).innerHTML = `Total Hours: ${hoursWorked.toFixed(2)}<br>Actual Worked Hours: ${actualWorkedHours.toFixed(2)}<br><span class="break-notation">${breakNotation}</span><br>Transactions: ${transactions.toFixed(2)}`;
-
-                totalHoursWorked += hoursWorked;
-                totalTransactions += transactions;
             }
+
+            // Apply 30% discount if 3 or more valid items
+            if (validItemCount >= 3) {
+                total *= 0.7;  // Apply 30% discount to total if 3 or more valid items
+                itemResults += `<div class="summary-item">Applying 30% discount for 3 or more items</div>`;
+            } else if (validItemCount >= 2) {
+                total *= 0.8;  // Apply 20% discount to total if exactly 2 valid items
+                itemResults += `<div class="summary-item">Applying 20% discount for 2 items</div>`;
+            }
+
+            // Display the total after discount
+            document.getElementById('result').innerText = 'Total after discount: $' + total.toFixed(2);
+            document.getElementById('itemResults').innerHTML = itemResults;
         }
 
-        document.getElementById("total-output").innerHTML = `Total Hours Worked: ${totalHoursWorked.toFixed(2)}<br>Total Transactions: ${totalTransactions.toFixed(2)}`;
-    }
+        function calculateMaximumSpend() {
+            const firstItemPrice = parseFloat(document.getElementById('firstItemPrice').value) || 0;
+            const customerBudget = parseFloat(document.getElementById('customerBudget').value) || 0;
 
-    function convert24To12(time24) {
-        const [hour, minute] = time24.split(':').map(Number);
-        const ampm = hour >= 12 ? 'PM' : 'AM';
-        const hour12 = hour % 12 || 12;
-        return `${hour12}:${minute < 10 ? '0' + minute : minute} ${ampm}`;
-    }
+            if (firstItemPrice <= 0 || customerBudget <= 0) {
+                alert('Please enter valid values for both fields.');
+                return;
+            }
 
-    function convert12To24(time12) {
-        const [time, modifier] = time12.split(' ');
-        let [hours, minutes] = time.split(':').map(Number);
+            const maxSpend = (customerBudget / 0.8) - firstItemPrice;
 
-        if (hours === 12) {
-            hours = 0;
-        }
-        if (modifier === 'PM') {
-            hours += 12;
+            document.getElementById('maxSpendResult').innerText = 'Maximum spend on second item to keep total under $' + customerBudget.toFixed(2) + ': $' + maxSpend.toFixed(2);
         }
 
-        return `${hours < 10 ? '0' + hours : hours}:${minutes < 10 ? '0' + minutes : minutes}`;
-    }
+        function resetForm() {
+            document.getElementById('items-container').innerHTML = '';
+            document.getElementById('result').innerText = '';
+            document.getElementById('itemResults').innerHTML = '';
+            document.getElementById('maxSpendResult').innerText = '';
+            itemCount = 0;
+            addItem();
+            addItem();
+        }
 
-    window.onload = addWorker; // Initialize with one worker on page load
-</script>
-
+        // Add initial item input fields
+        addItem();
+        addItem();
+    </script>
 </body>
 </html>
