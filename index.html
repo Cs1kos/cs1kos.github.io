@@ -100,7 +100,6 @@
 
         function calculateTotal() {
             let total = 0;
-            let itemEnteredCount = 0;
             let itemResults = '<h3>Item Details:</h3>';
 
             // Track valid items count
@@ -111,19 +110,18 @@
                 const itemPrice = parseFloat(document.getElementById(`item${i}Price`).value) || 0;
                 if (itemPrice > 0) {
                     validItemCount++;  // Increment valid item count for each non-zero price
-                    const discountedPrice = itemPrice * 0.8;  // Default to 20% discount
-                    total += discountedPrice;
-                    itemResults += `<div class="summary-item">Item ${i}: Original Price: $${itemPrice.toFixed(2)}, After Discount: $${discountedPrice.toFixed(2)}</div>`;
+                    total += itemPrice;  // Add the original item price to the total
+                    itemResults += `<div class="summary-item">Item ${i}: Original Price: $${itemPrice.toFixed(2)}</div>`;
                 }
             }
 
-            // Apply 30% discount if 3 or more valid items
-            if (validItemCount >= 3) {
-                total *= 0.7;  // Apply 30% discount to total if 3 or more valid items
-                itemResults += `<div class="summary-item">Applying 30% discount for 3 or more items</div>`;
-            } else if (validItemCount >= 2) {
-                total *= 0.8;  // Apply 20% discount to total if exactly 2 valid items
+            // Apply appropriate discount based on valid item count
+            if (validItemCount == 2) {
+                total *= 0.8;  // 20% discount for exactly 2 items
                 itemResults += `<div class="summary-item">Applying 20% discount for 2 items</div>`;
+            } else if (validItemCount >= 3) {
+                total *= 0.7;  // 30% discount for 3 or more items
+                itemResults += `<div class="summary-item">Applying 30% discount for 3 or more items</div>`;
             }
 
             // Display the total after discount
